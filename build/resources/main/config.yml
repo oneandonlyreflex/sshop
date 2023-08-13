@@ -1,0 +1,7 @@
+Spawners: #ENTITY_TYPE:COST
+  SPIDER: 1000
+  COW: 200
+  CREEPER: 4000
+MongoDB:
+  String: 'mongodb+srv://itzxitadoo:teste@cluster0.eerhvxp.mongodb.net/?retryWrites=true&w=majority'
+  db_name: 'testes'
