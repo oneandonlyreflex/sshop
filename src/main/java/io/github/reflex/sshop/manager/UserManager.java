@@ -18,6 +18,10 @@ public class UserManager {
     @Getter
     private  final List<User> users = new ArrayList<>();
 
+
+    public void testes() {
+
+    }
     public User fetchUserWithId(UUID playerId) {
         return users.stream().filter(user -> user.getPlayerId().equals(playerId)).findFirst().orElse(null);
     }
