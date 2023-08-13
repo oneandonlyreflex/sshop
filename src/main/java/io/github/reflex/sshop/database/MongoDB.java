@@ -169,6 +169,7 @@ public class MongoDB {
         List<History> playerHistory = StringTranslator.retrievedHistory(document.getString("history"));
         return new User(playerId, playerHistory);
     }
+
     public void close() {
         if (mongoClient != null) {
             mongoClient.close();

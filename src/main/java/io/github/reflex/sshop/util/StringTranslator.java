@@ -18,7 +18,7 @@ public class StringTranslator {
         return historyList.stream()
                 .map(history ->
                         String.format("%s,%s,%d",
-                                history.getSpawnerType().getName().toUpperCase(),
+                                String.valueOf(history.getSpawnerType()),
                                 history.getDateBought(),
                                 history.getAmountBought()))
                 .collect(Collectors.joining("@"));

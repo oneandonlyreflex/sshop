@@ -1,5 +1,6 @@
 package io.github.reflex.sshop.models;
 
+import io.github.reflex.sshop.Main;
 import io.github.reflex.sshop.util.ItemBuilder;
 import io.github.reflex.sshop.util.MobType;
 import io.github.reflex.sshop.util.SkullAPI;
@@ -30,7 +31,7 @@ public class History {
                 .name("§ax§e" + amountBought + " §d" + transformTypeName(spawnerType.toString()) + " Spawner")
                 .lore(
                         "",
-                        "§7Amount spent: §c" + 100,
+                        "§7Amount spent: §c" + gatherAmountSpent(spawnerType),
                         "§7Bought at: §c" + getFormattedBoughtTime(),
                         "") //fix method
 
@@ -47,5 +48,9 @@ public class History {
     private String transformTypeName(String s) {
         s = s.toLowerCase();
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    public double gatherAmountSpent(EntityType entityType) {
+        return Main.getInstance().spawnerManager.findSpawnerByType(entityType).getCost() * amountBought;
     }
 }

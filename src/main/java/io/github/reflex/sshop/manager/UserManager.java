@@ -18,10 +18,6 @@ public class UserManager {
     @Getter
     private  final List<User> users = new ArrayList<>();
 
-
-    public String testes() {
-        return "sdf";
-    }
     public User fetchUserWithId(UUID playerId) {
         return users.stream().filter(user -> user.getPlayerId().equals(playerId)).findFirst().orElse(null);
     }
@@ -32,12 +28,15 @@ public class UserManager {
     public void createUser(UUID playerId) {
         if (fetchUserWithId(playerId) == null) {
             users.add(new User(playerId, new ArrayList<>()));
-            System.out.println(testes());
         }
     }
 
     public History fetchHistoryByEntity(UUID playerId,EntityType entityType) {
         return fetchUserWithId(playerId).getPlayerHistory().stream().filter(history -> history.getSpawnerType().equals(entityType)).findFirst().orElse(null);
+    }
+
+    public void register(User user) {
+        users.add(user);
     }
 
     public void throwSpawnerInHistory(UUID playerId, EntityType type) {
