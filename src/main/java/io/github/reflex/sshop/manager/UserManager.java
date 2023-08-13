@@ -19,8 +19,8 @@ public class UserManager {
     private  final List<User> users = new ArrayList<>();
 
 
-    public void testes() {
-
+    public String testes() {
+        return "sdf";
     }
     public User fetchUserWithId(UUID playerId) {
         return users.stream().filter(user -> user.getPlayerId().equals(playerId)).findFirst().orElse(null);
@@ -32,6 +32,7 @@ public class UserManager {
     public void createUser(UUID playerId) {
         if (fetchUserWithId(playerId) == null) {
             users.add(new User(playerId, new ArrayList<>()));
+            System.out.println(testes());
         }
     }
 
