@@ -2,11 +2,8 @@ package io.github.reflex.sshop.listener;
 
 import io.github.reflex.sshop.Main;
 import io.github.reflex.sshop.gui.HistoryInventory;
-import io.github.reflex.sshop.manager.SpawnerManager;
 import io.github.reflex.sshop.util.Sort;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

@@ -14,7 +14,6 @@ import java.util.UUID;
 
 public class UserManager {
 
-
     @Getter
     private  final List<User> users = new ArrayList<>();
 

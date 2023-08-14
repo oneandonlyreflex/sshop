@@ -26,3 +26,6 @@ MongoDB:
   String: 'mongodb+srv://itzxitadoo:teste@cluster0.eerhvxp.mongodb.net/?retryWrites=true&w=majority'
   db_name: 'testes'
   mass_import: true
+COMMAND_USAGE: 'fodase.porra'
+FIRST: 'Bom dia mundo'
+TEST: false

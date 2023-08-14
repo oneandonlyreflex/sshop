@@ -7,32 +7,32 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.List;
 
-@Getter
 public class SpawnerManager {
 
-    private final Main main;
 
-    public SpawnerManager(Main main) {
-        this.main = main;
+    @Getter
+    private final List<Spawner> spawnerList;
+
+    public SpawnerManager() {
+        this.spawnerList = new ArrayList<>();
         loadSpawners();
     }
 
-    protected final ArrayList<Spawner> spawnerArrayList = new ArrayList<>();
-
     public void loadSpawners() {
-        for (String key : main.config.getConfig().getConfigurationSection("Spawners").getKeys(false)) {
+        for (String key : Main.getInstance().config.getConfig().getConfigurationSection("Spawners").getKeys(false)) {
             try {
-                Spawner spawner = new Spawner(EntityType.valueOf(key), main.config.getConfig().getInt("Spawners." + key));
-                spawnerArrayList.add(spawner);
-            } catch(IllegalArgumentException e) {
-                Bukkit.getConsoleSender().sendMessage("§a[SSHOP] §cConfig.yml Error: '§e"+key+"§c' Value in spawners config is not valid.");
+                Spawner spawner = new Spawner(EntityType.valueOf(key), Main.getInstance().config.getConfig().getInt("Spawners." + key));
+                spawnerList.add(spawner);
+            } catch (IllegalArgumentException e) {
+                Bukkit.getConsoleSender().sendMessage("§a[SSHOP] §cConfig.yml Error: '§e" + key + "§c' Value in spawners config is not valid.");
             }
         }
-        Bukkit.getConsoleSender().sendMessage("§a[SSHOP] §e"+spawnerArrayList.size()+"§a spawners loaded.");
+        Bukkit.getConsoleSender().sendMessage("§a[SSHOP] §e" + spawnerList.size() + "§a spawners loaded.");
     }
 
     public Spawner findSpawnerByType(EntityType entityType) {
-        return spawnerArrayList.stream().filter(spawner -> spawner.getEntityType().equals(entityType)).findFirst().orElse(null);
+        return spawnerList.stream().filter(spawner -> spawner.getEntityType().equals(entityType)).findFirst().orElse(null);
     }
 }

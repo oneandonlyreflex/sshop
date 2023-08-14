@@ -31,7 +31,7 @@ public class ShopCommand extends Command {
         if (args.length == 1) {
             switch (args[0]) {
                 case "buy":
-                    new SpawnerInventory(Main.getInstance().spawnerManager.getSpawnerArrayList(), player);
+                    new SpawnerInventory(Main.getInstance().spawnerManager.getSpawnerList(), player);
                     break;
                 case "history":
                     new HistoryInventory(Main.getInstance().userManager.fetchUserWithId(player.getUniqueId()).getPlayerHistory() , player);

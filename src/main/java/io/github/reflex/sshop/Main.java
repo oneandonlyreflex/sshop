@@ -6,17 +6,16 @@ import io.github.reflex.sshop.listener.InventoryClick;
 import io.github.reflex.sshop.listener.InventoryOpen;
 import io.github.reflex.sshop.manager.SpawnerManager;
 import io.github.reflex.sshop.manager.UserManager;
-import io.github.reflex.sshop.util.CommandMapProvider;
-import io.github.reflex.sshop.util.Configs;
-import io.github.reflex.sshop.util.SkullAPI;
+import io.github.reflex.sshop.util.*;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import fr.mrmicky.fastinv.FastInvManager;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class Main extends JavaPlugin {
@@ -26,6 +25,7 @@ public class Main extends JavaPlugin {
 
     public static Economy economy;
     public Configs config;
+    public Configs lang;
 
     public SpawnerManager spawnerManager;
     public UserManager userManager;
@@ -33,17 +33,20 @@ public class Main extends JavaPlugin {
     private boolean massimport;
 
 
+
     @Override
     public void onEnable() {
         instance = this;
 
-        FastInvManager.register(this);
         config = new Configs("config.yml");
         config.saveDefaultConfig();
 
+        lang = new Configs("lang/en_US.yml");
+        lang.saveDefaultConfig();
+
         massimport = config.getConfig().getBoolean("MongoDB.mass_import");
 
-        spawnerManager = new SpawnerManager(this);
+        spawnerManager = new SpawnerManager();
         userManager = new UserManager();
 
         Bukkit.getServer().getPluginManager().registerEvents(new InventoryClick(), this);

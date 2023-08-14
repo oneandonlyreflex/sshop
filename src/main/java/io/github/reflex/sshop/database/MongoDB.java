@@ -10,10 +10,8 @@ import io.github.reflex.sshop.util.StringTranslator;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -22,11 +20,12 @@ import java.util.concurrent.Executors;
 
 public class MongoDB {
 
-    private static MongoClient mongoClient;
-    private static MongoDatabase database;
+    private static MongoClient MONGOCLIENT;
+    private static MongoDatabase DATABASE;
+    private final MongoCollection<Document> COLLECTION = DATABASE.getCollection("sshop");
     private final Executor executor = Executors.newCachedThreadPool();
+
     private Plugin plugin;
-    private final MongoCollection<Document> collection = database.getCollection("sshop");
 
     public MongoDB(Plugin plugin) {
         this.plugin = plugin;
@@ -38,8 +37,8 @@ public class MongoDB {
                     .applyConnectionString(new ConnectionString(connectionString))
                     .uuidRepresentation(UuidRepresentation.STANDARD)
                     .build();
-            mongoClient = MongoClients.create(settings);
-            database = mongoClient.getDatabase(databaseName);
+            MONGOCLIENT = MongoClients.create(settings);
+            DATABASE = MONGOCLIENT.getDatabase(databaseName);
             plugin.getLogger().info("Connected to MongoDB database '" + databaseName + "'.");
         } catch (Exception e) {
             plugin.getLogger().severe("Failed to connect to MongoDB: " + e.getMessage());
@@ -50,13 +49,13 @@ public class MongoDB {
     public CompletableFuture<Boolean> pushUserToDatabase(User user) {
         Document filter = new Document("playerId", user.getPlayerId().toString());
 
-        FindIterable<Document> documents = collection.find(filter);
+        FindIterable<Document> documents = COLLECTION.find(filter);
         boolean userExists = documents.iterator().hasNext();
 
         if (!userExists) {
             return CompletableFuture.supplyAsync(() -> {
                 try {
-                   return collection.insertOne(new Document().append("playerId", user.getPlayerId().toString())
+                   return COLLECTION.insertOne(new Document().append("playerId", user.getPlayerId().toString())
                            .append("history", StringTranslator.historyTranslated(user.getPlayerHistory()))).wasAcknowledged();
                 } catch (Exception e) {
                     return false;
@@ -73,12 +72,12 @@ public class MongoDB {
 
         for (User user : userList) {
             Document filter = new Document("playerId", user.getPlayerId().toString());
-            FindIterable<Document> documents = collection.find(filter);
+            FindIterable<Document> documents = COLLECTION.find(filter);
             boolean userExists = documents.iterator().hasNext();
             if (!userExists) {
                 CompletableFuture<Boolean> userFuture = CompletableFuture.supplyAsync(() -> {
                     try {
-                        return collection.insertOne(new Document()
+                        return COLLECTION.insertOne(new Document()
                                         .append("playerId", user.getPlayerId().toString())
                                         .append("history", StringTranslator.historyTranslated(user.getPlayerHistory())))
                                 .wasAcknowledged();
@@ -112,7 +111,7 @@ public class MongoDB {
         Document query = new Document("playerId", new Document("$in", playerIds));
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return collection.deleteMany(query).getDeletedCount() > 0;
+                return COLLECTION.deleteMany(query).getDeletedCount() > 0;
             } catch (Exception e) {
                 return false;
             }
@@ -126,7 +125,7 @@ public class MongoDB {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Document updateDoc = new Document("$set", new Document("history", StringTranslator.historyTranslated(user.getPlayerHistory())));
-                UpdateResult updateResult = collection.updateOne(filter, updateDoc);
+                UpdateResult updateResult = COLLECTION.updateOne(filter, updateDoc);
                 return updateResult.getModifiedCount() > 0;
             } catch (Exception e) {
                 return false;
@@ -135,7 +134,7 @@ public class MongoDB {
     }
 
     public CompletableFuture<List<User>> fetchAllUsers() {
-        FindIterable<Document> documents = collection.find();
+        FindIterable<Document> documents = COLLECTION.find();
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -156,7 +155,7 @@ public class MongoDB {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return collection.deleteOne(filter).getDeletedCount() > 0;
+                return COLLECTION.deleteOne(filter).getDeletedCount() > 0;
             } catch (Exception e) {
                 return false;
             }
@@ -171,8 +170,8 @@ public class MongoDB {
     }
 
     public void close() {
-        if (mongoClient != null) {
-            mongoClient.close();
+        if (MONGOCLIENT != null) {
+            MONGOCLIENT.close();
         }
     }
 }
