@@ -27,7 +27,7 @@ public class Main extends JavaPlugin {
     public SpawnerManager spawnerManager;
     public UserManager userManager;
     public MongoDB mongoDB;
-    public static Economy economy;
+    public Economy economy;
 
     @Override
     public void onEnable() {

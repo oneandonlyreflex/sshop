@@ -67,7 +67,7 @@ public class InventoryClick implements Listener {
             if (inventoryClickEvent.getCurrentItem() == null || inventoryClickEvent.getCurrentItem().getType().equals(Material.AIR)) return;
             if (inventoryClickEvent.getCurrentItem().getItemMeta().getDisplayName().contains("Spawner")) {
                 EntityType spawnerEntityType = EntityType.valueOf(inventoryClickEvent.getCurrentItem().getItemMeta().getDisplayName().replace("§e", "").replace(" Spawner", "").toUpperCase());
-                if (Main.economy.getBalance((Player)inventoryClickEvent.getWhoClicked()) < Main.getInstance().spawnerManager.findSpawnerByType(spawnerEntityType).getCost()) {
+                if (Main.getInstance().economy.getBalance((Player)inventoryClickEvent.getWhoClicked()) < Main.getInstance().spawnerManager.findSpawnerByType(spawnerEntityType).getCost()) {
                     inventoryClickEvent.getWhoClicked().sendMessage("§cYou dont have enough money for that.");
                     inventoryClickEvent.getWhoClicked().closeInventory();
                     return;
@@ -77,7 +77,7 @@ public class InventoryClick implements Listener {
                     spawnerMeta.setDisplayName(inventoryClickEvent.getCurrentItem().getItemMeta().getDisplayName());
                     itemStack.setItemMeta(spawnerMeta);
                     inventoryClickEvent.getWhoClicked().getInventory().addItem(itemStack);
-                    Main.economy.withdrawPlayer((Player) inventoryClickEvent.getWhoClicked(),Main.getInstance().spawnerManager.findSpawnerByType(spawnerEntityType).getCost());
+                    Main.getInstance().economy.withdrawPlayer((Player) inventoryClickEvent.getWhoClicked(),Main.getInstance().spawnerManager.findSpawnerByType(spawnerEntityType).getCost());
                     inventoryClickEvent.getWhoClicked().sendMessage("§aThank you for trusting us to buy your Spawners :D");
                     Main.getInstance().userManager.throwSpawnerInHistory(inventoryClickEvent.getWhoClicked().getUniqueId(), spawnerEntityType);
                 }
