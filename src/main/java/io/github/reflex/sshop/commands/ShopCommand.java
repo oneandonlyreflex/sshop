@@ -26,7 +26,7 @@ public class ShopCommand extends Command {
 
         Player player = (Player) s;
         if (args.length == 0) {
-            s.sendMessage("§cUsage: /sshop (buy/history) §e(player)");
+            s.sendMessage("§cUsage: /sshop (buy/history)");
             return false;
         }
         if (args.length == 1) {
