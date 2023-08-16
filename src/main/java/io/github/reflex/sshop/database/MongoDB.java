@@ -109,9 +109,7 @@ public class MongoDB {
         List<CompletableFuture<Boolean>> userFutures = new ArrayList<>();
 
         for (User user : userList.values()) {
-            System.out.println("Sending " + user.getPlayerId());
             if (!user.getPlayerHistory().isEmpty()) {
-                System.out.println("Was not empty");
                 Document filter = new Document("playerId", user.getPlayerId().toString());
                 FindIterable<Document> documents = COLLECTION.find(filter);
                 boolean userExists = documents.iterator().hasNext();
@@ -131,8 +129,6 @@ public class MongoDB {
                 } else {
                     updateUser(user);
                 }
-            } else {
-                System.out.println("Was empty -> " + user.getPlayerHistory());
             }
         }
 
