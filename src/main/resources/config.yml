@@ -23,5 +23,5 @@ Spawners: #ENTITY_TYPE:COST
   BAT: 10
   CHICKEN: 10
 MongoDB:
-  connection_String: 'mongodb+srv://itzxitadoo:teste@cluster0.eerhvxp.mongodb.net/?retryWrites=true&w=majority'
-  db_name: 'testes'
+  connection_String: 'mongodb+srv://<user>:<password>@cluster0.eerhvxp.mongodb.net/?retryWrites=true&w=majority'
+  db_name: 'sshop'
