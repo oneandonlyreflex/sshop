@@ -23,6 +23,5 @@ Spawners: #ENTITY_TYPE:COST
   BAT: 10
   CHICKEN: 10
 MongoDB:
-  String: 'mongodb+srv://itzxitadoo:teste@cluster0.eerhvxp.mongodb.net/?retryWrites=true&w=majority'
+  connection_String: 'mongodb+srv://itzxitadoo:teste@cluster0.eerhvxp.mongodb.net/?retryWrites=true&w=majority'
   db_name: 'testes'
-  mass_import: true

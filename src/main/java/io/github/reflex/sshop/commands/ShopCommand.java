@@ -3,7 +3,9 @@ package io.github.reflex.sshop.commands;
 import io.github.reflex.sshop.Main;
 import io.github.reflex.sshop.gui.HistoryInventory;
 import io.github.reflex.sshop.gui.SpawnerInventory;
+import io.github.reflex.sshop.util.Players;
 import io.github.reflex.sshop.util.Sort;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +18,6 @@ public class ShopCommand extends Command {
         super("sshop");
     }
 
-    // /sshop (buy/history)
     @Override
     public boolean execute(CommandSender s, String label, String[] args) {
         if (!(s instanceof Player)) {
@@ -25,7 +26,7 @@ public class ShopCommand extends Command {
 
         Player player = (Player) s;
         if (args.length == 0) {
-            s.sendMessage("§cUsage: /sshop (buy/history)");
+            s.sendMessage("§cUsage: /sshop (buy/history) §e(player)");
             return false;
         }
         if (args.length == 1) {

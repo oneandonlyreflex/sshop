@@ -43,8 +43,6 @@ public class InventoryOpen implements Listener {
         return itemStack;
     }
 
-    //39,40,41
-    //http://textures.minecraft.net/texture/1c6b9316ad145e6e63c7ef546a8cbcbfb28224293b3b6539d5725753a1cbdb26
     @EventHandler
     public void onHistoryInventoryOpen(InventoryOpenEvent inventoryOpenEvent) {
 

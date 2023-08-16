@@ -1,5 +1,7 @@
 package io.github.reflex.sshop.manager;
 
+
+import io.github.reflex.sshop.Main;
 import io.github.reflex.sshop.models.History;
 import io.github.reflex.sshop.models.User;
 import io.github.reflex.sshop.util.Players;
@@ -7,33 +9,33 @@ import lombok.Getter;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class UserManager {
+public class UserManager_Depricated {
 
     @Getter
-    private final Map<UUID, User> users = new ConcurrentHashMap<>();
+    private  final List<User> users = new ArrayList<>();
 
     public User fetchUserWithId(UUID playerId) {
-        return users.get(playerId);
+        return users.stream().filter(user -> user.getPlayerId().equals(playerId)).findFirst().orElse(null);
     }
-
     public User fetchUserWithName(String playerName) {
-        return users.get(Players.fetchPlayerUniqueId(playerName));
+        return users.stream().filter(user -> user.getPlayerId().equals(Players.fetchPlayerUniqueId(playerName))).findFirst().orElse(null);
     }
 
-    public void createUser(UUID playerId) { //Method creates a Non-existing user
-        users.putIfAbsent(playerId, new User(playerId, new ArrayList<>()));
+    public void createUser(UUID playerId) {
+        if (fetchUserWithId(playerId) == null) {
+            users.add(new User(playerId, new ArrayList<>()));
+        }
     }
 
     public History fetchHistoryByEntity(UUID playerId,EntityType entityType) {
-        return users.get(playerId).getPlayerHistory().stream().filter(history -> history.getSpawnerType().equals(entityType)).findFirst().orElse(null);
+        return fetchUserWithId(playerId).getPlayerHistory().stream().filter(history -> history.getSpawnerType().equals(entityType)).findFirst().orElse(null);
     }
 
-    public void register(User user) { //Method registers a user that is already on the database
-        users.putIfAbsent(user.getPlayerId(), user);
+    public void register(User user) {
+        users.add(user);
     }
 
     public void throwSpawnerInHistory(UUID playerId, EntityType type) {
@@ -44,3 +46,4 @@ public class UserManager {
         }
     }
 }
+

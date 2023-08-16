@@ -13,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -67,27 +68,71 @@ public class MongoDB {
         }
     }
 
-    public CompletableFuture<Boolean> pushMultipleUsersToDatabase(List<User> userList) {
-        List<CompletableFuture<Boolean>> userFutures = new ArrayList<>();
+    public boolean pushMultipleUsersToDatabaseSync(Map<UUID, User> userList) {
+        for (User user : userList.values()) {
+            if (!user.getPlayerHistory().isEmpty()) {
+                Document filter = new Document("playerId", user.getPlayerId().toString());
+                FindIterable<Document> documents = COLLECTION.find(filter);
+                boolean userExists = documents.iterator().hasNext();
 
-        for (User user : userList) {
-            Document filter = new Document("playerId", user.getPlayerId().toString());
-            FindIterable<Document> documents = COLLECTION.find(filter);
-            boolean userExists = documents.iterator().hasNext();
-            if (!userExists) {
-                CompletableFuture<Boolean> userFuture = CompletableFuture.supplyAsync(() -> {
+                if (!userExists) {
                     try {
-                        return COLLECTION.insertOne(new Document()
-                                        .append("playerId", user.getPlayerId().toString())
-                                        .append("history", StringTranslator.historyTranslated(user.getPlayerHistory())))
-                                .wasAcknowledged();
+                        COLLECTION.insertOne(new Document()
+                                .append("playerId", user.getPlayerId().toString())
+                                .append("history", StringTranslator.historyTranslated(user.getPlayerHistory())));
                     } catch (Exception e) {
+                        e.printStackTrace();
                         return false;
                     }
-                }, executor);
-                userFutures.add(userFuture);
+                } else {
+                    updateUser(user);
+                }
+            }
+        }
+
+        // Check if all users were successfully added
+        for (User user : userList.values()) {
+            if (!user.getPlayerHistory().isEmpty()) {
+                Document filter = new Document("playerId", user.getPlayerId().toString());
+                FindIterable<Document> documents = COLLECTION.find(filter);
+                boolean userExists = documents.iterator().hasNext();
+
+                if (!userExists) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public CompletableFuture<Boolean> pushMultipleUsersToDatabase(Map<UUID, User> userList) {
+        List<CompletableFuture<Boolean>> userFutures = new ArrayList<>();
+
+        for (User user : userList.values()) {
+            System.out.println("Sending " + user.getPlayerId());
+            if (!user.getPlayerHistory().isEmpty()) {
+                System.out.println("Was not empty");
+                Document filter = new Document("playerId", user.getPlayerId().toString());
+                FindIterable<Document> documents = COLLECTION.find(filter);
+                boolean userExists = documents.iterator().hasNext();
+
+                if (!userExists) {
+                    CompletableFuture<Boolean> userFuture = CompletableFuture.supplyAsync(() -> {
+                        try {
+                            return COLLECTION.insertOne(new Document()
+                                            .append("playerId", user.getPlayerId().toString())
+                                            .append("history", StringTranslator.historyTranslated(user.getPlayerHistory())))
+                                    .wasAcknowledged();
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    }, executor);
+                    userFutures.add(userFuture);
+                } else {
+                    updateUser(user);
+                }
             } else {
-                updateUser(user);
+                System.out.println("Was empty -> " + user.getPlayerHistory());
             }
         }
 
@@ -146,6 +191,24 @@ public class MongoDB {
                 return userList;
             } catch (Exception e) {
                 throw new RuntimeException("Failed to fetch users", e);
+            }
+        }, executor);
+    }
+
+    public CompletableFuture<User> fetchUser(String playerId) {
+        Document query = new Document("playerId", playerId);
+        FindIterable<Document> documents = COLLECTION.find(query).limit(1);
+
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Document document = documents.first();
+                if (document != null) {
+                    return convertDocumentToUser(document);
+                } else {
+                    return null;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to fetch user", e);
             }
         }, executor);
     }

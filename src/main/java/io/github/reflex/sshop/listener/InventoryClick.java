@@ -20,11 +20,11 @@ public class InventoryClick implements Listener {
         if (inventoryClickEvent.getInventory().getName().equalsIgnoreCase("§8Spawner History")) {
             if (inventoryClickEvent.getSlot() == 40) {
                 if (inventoryClickEvent.isLeftClick()) {
-                    if (HistoryInventory.getSORT().equals(Sort.DATE_REVERSED)) {
+                    if (HistoryInventory.getSORT().equals(Sort.DATE_REVERSED) || HistoryInventory.getSORT().equals(Sort.DATE)) {
                         HistoryInventory.updateSort(Sort.AMOUNT);
                         inventoryClickEvent.getWhoClicked().closeInventory();
                         new HistoryInventory(Main.getInstance().userManager.fetchUserWithId(inventoryClickEvent.getWhoClicked().getUniqueId()).getPlayerHistory() , (Player) inventoryClickEvent.getWhoClicked());
-                    } else if (HistoryInventory.getSORT().equals(Sort.AMOUNT)){
+                    } else if (HistoryInventory.getSORT().equals(Sort.AMOUNT) || HistoryInventory.getSORT().equals(Sort.AMOUNT_REVERSED)){
                         HistoryInventory.updateSort(Sort.DATE_REVERSED);
                         inventoryClickEvent.getWhoClicked().closeInventory();
                         new HistoryInventory(Main.getInstance().userManager.fetchUserWithId(inventoryClickEvent.getWhoClicked().getUniqueId()).getPlayerHistory() , (Player) inventoryClickEvent.getWhoClicked());
@@ -64,6 +64,7 @@ public class InventoryClick implements Listener {
     @EventHandler
     public void buyItemSpawner(InventoryClickEvent inventoryClickEvent) {
         if (inventoryClickEvent.getClickedInventory().getName().equalsIgnoreCase("§8Spawner Shop")) {
+            if (inventoryClickEvent.getCurrentItem() == null || inventoryClickEvent.getCurrentItem().getType().equals(Material.AIR)) return;
             if (inventoryClickEvent.getCurrentItem().getItemMeta().getDisplayName().contains("Spawner")) {
                 EntityType spawnerEntityType = EntityType.valueOf(inventoryClickEvent.getCurrentItem().getItemMeta().getDisplayName().replace("§e", "").replace(" Spawner", "").toUpperCase());
                 if (Main.economy.getBalance((Player)inventoryClickEvent.getWhoClicked()) < Main.getInstance().spawnerManager.findSpawnerByType(spawnerEntityType).getCost()) {
@@ -77,14 +78,8 @@ public class InventoryClick implements Listener {
                     itemStack.setItemMeta(spawnerMeta);
                     inventoryClickEvent.getWhoClicked().getInventory().addItem(itemStack);
                     Main.economy.withdrawPlayer((Player) inventoryClickEvent.getWhoClicked(),Main.getInstance().spawnerManager.findSpawnerByType(spawnerEntityType).getCost());
-                   /// inventoryClickEvent.getWhoClicked().closeInventory();
                     inventoryClickEvent.getWhoClicked().sendMessage("§aThank you for trusting us to buy your Spawners :D");
-                    if (Main.getInstance().userManager.fetchUserWithId(inventoryClickEvent.getWhoClicked().getUniqueId()) == null) {
-                        Main.getInstance().userManager.createUser(inventoryClickEvent.getWhoClicked().getUniqueId());
-                        Main.getInstance().userManager.throwSpawnerInHistory(inventoryClickEvent.getWhoClicked().getUniqueId(), spawnerEntityType);
-                    } else {
-                        Main.getInstance().userManager.throwSpawnerInHistory(inventoryClickEvent.getWhoClicked().getUniqueId(), spawnerEntityType);
-                    }
+                    Main.getInstance().userManager.throwSpawnerInHistory(inventoryClickEvent.getWhoClicked().getUniqueId(), spawnerEntityType);
                 }
             }
         }

@@ -4,6 +4,7 @@ import io.github.reflex.sshop.commands.ShopCommand;
 import io.github.reflex.sshop.database.MongoDB;
 import io.github.reflex.sshop.listener.InventoryClick;
 import io.github.reflex.sshop.listener.InventoryOpen;
+import io.github.reflex.sshop.listener.PlayerJoin;
 import io.github.reflex.sshop.manager.SpawnerManager;
 import io.github.reflex.sshop.manager.UserManager;
 import io.github.reflex.sshop.util.*;
@@ -13,9 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 
 
 public class Main extends JavaPlugin {
@@ -23,16 +22,12 @@ public class Main extends JavaPlugin {
     @Getter
     private static Main instance;
 
-    public static Economy economy;
     public Configs config;
-    public Configs lang;
 
     public SpawnerManager spawnerManager;
     public UserManager userManager;
     public MongoDB mongoDB;
-    private boolean massimport;
-
-
+    public static Economy economy;
 
     @Override
     public void onEnable() {
@@ -41,35 +36,20 @@ public class Main extends JavaPlugin {
         config = new Configs("config.yml");
         config.saveDefaultConfig();
 
-        lang = new Configs("lang/en_US.yml");
-        lang.saveDefaultConfig();
-
-        massimport = config.getConfig().getBoolean("MongoDB.mass_import");
-
         spawnerManager = new SpawnerManager();
         userManager = new UserManager();
 
         Bukkit.getServer().getPluginManager().registerEvents(new InventoryClick(), this);
         Bukkit.getServer().getPluginManager().registerEvents(new InventoryOpen(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
 
         try {
-            mongoDB = MongoDB.mongoRepository(this, config.getString("MongoDB.String"), config.getString("MongoDB.db_name"));
-            if (massimport) {
-                mongoDB.fetchAllUsers().whenComplete((users, throwable) -> {
-                    if (throwable != null) {
-                        throwable.printStackTrace();
-                    } else {
-                        users.forEach(userManager::register);
-                        Bukkit.getConsoleSender().sendMessage("§aLoaded " + users.size() + " users.");
-                    }
-                });
-            }
+            mongoDB = MongoDB.mongoRepository(this, config.getString("MongoDB.connection_String"), config.getString("MongoDB.db_name"));
             SkullAPI.load();
             hookEconomy();
             CommandMapProvider.getCommandMap().registerAll("sshop", Arrays.asList(
                     new ShopCommand()
             ));
-
         } catch (Exception e) {
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
@@ -78,16 +58,14 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        mongoDB.pushMultipleUsersToDatabase(userManager.getUsers()).whenComplete((aBoolean, throwable) -> {
-            if (throwable != null) {
-                throwable.printStackTrace();
-            } else {
-                Bukkit.getConsoleSender().sendMessage("§aSSHOP users saved, shutting down");
-                spawnerManager = null;
-                userManager = null;
-            }
-        });
-        //mongoDB.close();
+        if (mongoDB.pushMultipleUsersToDatabaseSync(userManager.getUsers())) {
+            Bukkit.getConsoleSender().sendMessage("§a[SSHOP] users saved, shutting down");
+            spawnerManager = null;
+            userManager = null;
+            mongoDB.close();
+        } else {
+            Bukkit.getConsoleSender().sendMessage("§c[SSHOP] There was an error saving the users.");
+        }
     }
 
     private boolean hookEconomy() {

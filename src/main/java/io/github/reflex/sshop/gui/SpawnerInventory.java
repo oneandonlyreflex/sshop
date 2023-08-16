@@ -12,11 +12,9 @@ import java.util.List;
 
 public class SpawnerInventory {
 
-    private final List<Spawner> spawners;
     private final ArrayList<ItemStack> inventoryItems = new ArrayList<>();
 
     public SpawnerInventory(@NotNull List<Spawner> spawners, Player player) {
-        this.spawners = spawners;
 
         spawners.stream()
                 .sorted(Comparator.comparingDouble(Spawner::getCost).reversed())

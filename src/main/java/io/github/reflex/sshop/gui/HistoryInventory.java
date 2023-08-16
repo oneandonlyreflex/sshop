@@ -19,13 +19,9 @@ public class HistoryInventory {
 
     @Getter
     private static Sort SORT;
-    private Player player;
-    private final List<History> playerHistory;
     private final ArrayList<ItemStack> inventoryItems = new ArrayList<>();
 
     public HistoryInventory(@NotNull List<History> playerHistory, Player player) {
-        this.playerHistory = playerHistory;
-        this.player = player;
         InvAPI historyInventory;
 
         //The default is to sort the history based on date
