@@ -2,7 +2,6 @@ package io.github.reflex.sshop.gui;
 
 import io.github.reflex.sshop.models.History;
 import io.github.reflex.sshop.util.InvAPI;
-import io.github.reflex.sshop.util.ItemBuilder;
 import io.github.reflex.sshop.util.Sort;
 import lombok.Getter;
 import org.bukkit.Material;

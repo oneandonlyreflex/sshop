@@ -1,7 +1,6 @@
 package io.github.reflex.sshop.listener;
 
 import io.github.reflex.sshop.gui.HistoryInventory;
-import io.github.reflex.sshop.models.History;
 import io.github.reflex.sshop.util.SkullAPI;
 import io.github.reflex.sshop.util.Sort;
 import org.bukkit.event.EventHandler;
@@ -11,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class InventoryOpen implements Listener {
 

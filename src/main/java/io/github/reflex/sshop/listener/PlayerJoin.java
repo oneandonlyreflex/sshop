@@ -1,9 +1,6 @@
 package io.github.reflex.sshop.listener;
 
 import io.github.reflex.sshop.Main;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;

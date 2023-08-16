@@ -1,6 +1,5 @@
 package io.github.reflex.sshop.models;
 
-import com.avaje.ebean.validation.NotNull;
 import io.github.reflex.sshop.util.ItemBuilder;
 import io.github.reflex.sshop.util.MobType;
 import lombok.AllArgsConstructor;

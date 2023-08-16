@@ -3,11 +3,7 @@ package io.github.reflex.sshop.commands;
 import io.github.reflex.sshop.Main;
 import io.github.reflex.sshop.gui.HistoryInventory;
 import io.github.reflex.sshop.gui.SpawnerInventory;
-import io.github.reflex.sshop.util.Players;
-import io.github.reflex.sshop.util.Sort;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
