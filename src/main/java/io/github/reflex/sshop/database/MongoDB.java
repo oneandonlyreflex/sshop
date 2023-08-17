@@ -56,13 +56,13 @@ public class MongoDB {
         if (!userExists) {
             return CompletableFuture.supplyAsync(() -> {
                 try {
-                   return COLLECTION.insertOne(new Document().append("playerId", user.getPlayerId().toString())
-                           .append("history", StringTranslator.historyTranslated(user.getPlayerHistory()))).wasAcknowledged();
+                    return COLLECTION.insertOne(new Document().append("playerId", user.getPlayerId().toString())
+                            .append("history", StringTranslator.historyTranslated(user.getPlayerHistory()))).wasAcknowledged();
                 } catch (Exception e) {
                     return false;
                 }
             }, executor);
-        } else  {
+        } else {
             updateUser(user);
             return CompletableFuture.completedFuture(false);
         }

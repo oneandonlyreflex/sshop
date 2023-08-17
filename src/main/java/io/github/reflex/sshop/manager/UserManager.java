@@ -3,12 +3,12 @@ package io.github.reflex.sshop.manager;
 import io.github.reflex.sshop.models.History;
 import io.github.reflex.sshop.models.User;
 import io.github.reflex.sshop.util.Players;
+import io.github.reflex.sshop.util.Sort;
 import lombok.Getter;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserManager {
@@ -41,6 +41,38 @@ public class UserManager {
             fetchUserWithId(playerId).getPlayerHistory().add(new History(type, System.currentTimeMillis(), 1));
         }else {
             fetchHistoryByEntity(playerId, type).incrementAmountBought();
+            fetchHistoryByEntity(playerId, type).setDateBought(System.currentTimeMillis());
         }
+    }
+
+    public ArrayList<ItemStack> getSortedList(List<History> playerHistory, Sort sort) {
+        ArrayList<ItemStack> inventoryItems = new ArrayList<>();
+        switch (sort) {
+            case DATE_REVERSED:
+                playerHistory.stream()
+                        .sorted(Comparator.comparingLong(History::getDateBought).reversed())
+                        .map(History::asItemStack)
+                        .forEach(inventoryItems::add);
+                break;
+            case DATE:
+                playerHistory.stream()
+                        .sorted(Comparator.comparingLong(History::getDateBought))
+                        .map(History::asItemStack)
+                        .forEach(inventoryItems::add);
+                break;
+            case AMOUNT:
+                playerHistory.stream()
+                        .sorted(Comparator.comparingLong(History::getAmountBought))
+                        .map(History::asItemStack)
+                        .forEach(inventoryItems::add);
+                break;
+            case AMOUNT_REVERSED:
+                playerHistory.stream()
+                        .sorted(Comparator.comparingLong(History::getAmountBought).reversed())
+                        .map(History::asItemStack)
+                        .forEach(inventoryItems::add);
+                break;
+        }
+        return inventoryItems;
     }
 }

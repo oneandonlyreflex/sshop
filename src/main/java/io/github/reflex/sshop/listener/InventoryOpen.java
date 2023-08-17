@@ -1,6 +1,7 @@
 package io.github.reflex.sshop.listener;
 
 import io.github.reflex.sshop.gui.HistoryInventory;
+import io.github.reflex.sshop.util.InvAPI;
 import io.github.reflex.sshop.util.SkullAPI;
 import io.github.reflex.sshop.util.Sort;
 import org.bukkit.event.EventHandler;
@@ -8,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import io.github.reflex.sshop.util.InvAPI.ScrollerHolder;
 
 import java.util.Arrays;
 
@@ -19,21 +21,34 @@ public class InventoryOpen implements Listener {
         meta.setDisplayName("§aSort settings");
 
         switch (sort) {
-            case DATE_REVERSED:
             case DATE:
                 meta.setLore(Arrays.asList(
                         "",
-                        "§a• Sort by Date (Right-click to change)",
+                        "§a• Sort by Date §d[→]",
+                        "§7• Sort by Amount",
+                        ""
+                ));
+                break;
+            case DATE_REVERSED:
+                meta.setLore(Arrays.asList(
+                        "",
+                        "§a• Sort by Date §d[←]",
                         "§7• Sort by Amount",
                         ""
                 ));
                 break;
             case AMOUNT:
+                meta.setLore(Arrays.asList(
+                        "",
+                        "§7• Sort by Date",
+                        "§a• Sort by Amount §d[-]",
+                        ""));
+                break;
             case AMOUNT_REVERSED:
                 meta.setLore(Arrays.asList(
                         "",
                         "§7• Sort by Date",
-                        "§a• Sort by Amount (Right-click to change)",
+                        "§a• Sort by Amount §d[+]",
                         ""));
                 break;
         }
@@ -43,9 +58,10 @@ public class InventoryOpen implements Listener {
 
     @EventHandler
     public void onHistoryInventoryOpen(InventoryOpenEvent inventoryOpenEvent) {
-
         if (inventoryOpenEvent.getInventory().getName().equalsIgnoreCase("§8Spawner History")) {
-            inventoryOpenEvent.getInventory().setItem(40, sortItem(HistoryInventory.getSORT()));
+            ScrollerHolder scrollerHolder = (ScrollerHolder) inventoryOpenEvent.getInventory().getHolder();
+            System.out.println(scrollerHolder.getSortMethod());
+            inventoryOpenEvent.getInventory().setItem(40, sortItem(scrollerHolder.getSortMethod()));
         }
     }
 }

@@ -1,11 +1,7 @@
 package io.github.reflex.sshop.util;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import io.github.reflex.sshop.Main;
 import org.bukkit.Bukkit;
@@ -59,6 +55,8 @@ public class InvAPI {
     private int backSlot;
     private int previousPage;
     private int nextPage;
+    private UUID owner;
+    private Sort sortMethod;
 
     private PlayerRunnable backRunnable;
     private ChooseItemRunnable onClickRunnable;
@@ -74,6 +72,8 @@ public class InvAPI {
         this.previousPage = builder.previousPage;
         this.nextPage = builder.nextPage;
         this.onClickRunnable = builder.clickRunnable;
+        this.owner = builder.owner;
+        this.sortMethod = builder.sortMethod;
         createInventories();
     }
 
@@ -81,7 +81,8 @@ public class InvAPI {
         List<List<ItemStack>> lists = getPages(items, slots.size());
         int page = 1;
         for (List<ItemStack> list : lists) {
-            Inventory inventory = Bukkit.createInventory(new ScrollerHolder(this, page), inventorySize, name);
+            Inventory inventory = Bukkit.createInventory(new ScrollerHolder(this, page, owner, sortMethod), inventorySize, name);
+            ((ScrollerHolder) inventory.getHolder()).setInventory(inventory);
             int slot = 0;
             for (ItemStack it : list) {
                 inventory.setItem(slots.get(slot), it);
@@ -140,24 +141,33 @@ public class InvAPI {
             pageSize = list.size();
         int numPages = (int) Math.ceil((double) list.size() / (double) pageSize);
         List<List<T>> pages = new ArrayList<List<T>>(numPages);
-        for (int pageNum = 0; pageNum < numPages;)
+        for (int pageNum = 0; pageNum < numPages; )
             pages.add(list.subList(pageNum * pageSize, Math.min(++pageNum * pageSize, list.size())));
         return pages;
     }
 
-    private class ScrollerHolder implements InventoryHolder {
+    public class ScrollerHolder implements InventoryHolder {
         private InvAPI scroller;
         private int page;
+        private UUID owner;
+        private Sort sortMethod;
+        private Inventory inventory;
 
-        public ScrollerHolder(InvAPI scroller, int page) {
+        public ScrollerHolder(InvAPI scroller, int page, UUID owner, Sort sortMethod) {
             super();
             this.scroller = scroller;
             this.page = page;
+            this.owner = owner;
+            this.sortMethod = sortMethod;
         }
 
         @Override
         public Inventory getInventory() {
-            return null;
+            return inventory; // Return the associated inventory
+        }
+
+        public void setInventory(Inventory inventory) {
+            this.inventory = inventory; // Set the associated inventory
         }
 
         /**
@@ -172,6 +182,93 @@ public class InvAPI {
          */
         public int getPage() {
             return page;
+        }
+
+        public UUID getOwner() {
+            return owner;
+        }
+
+        public Sort getSortMethod() {
+            return sortMethod;
+        }
+
+        public void setSortMethod(Sort sortMethod) {
+            this.sortMethod = sortMethod;
+        }
+
+        /*public void replaceInventoryItems(List<ItemStack> newInventoryItems) {
+            if (inventory == null || newInventoryItems == null) {
+                return; // Inventory or new items not set, nothing to replace
+            }
+
+            inventory.clear();
+
+            for (int slot = 0; slot < newInventoryItems.size() && slot < slots.size(); slot++) {
+                inventory.setItem(slots.get(slot), newInventoryItems.get(slot));
+            }
+
+            // Update arrow items for navigating between pages
+            if (previousPage >= 0 && scroller.hasPage(page - 1)) {
+                inventory.setItem(previousPage, getPageFlecha(page - 1));
+            }
+
+            if (nextPage >= 0 && scroller.hasPage(page + 1)) {
+                inventory.setItem(nextPage, getPageFlecha(page + 1));
+            }
+
+            // Update the inventory in the pages map
+            if (scroller != null && scroller.pages.containsKey(page)) {
+                scroller.pages.put(page, inventory);
+            }
+
+            // Update items in the next pages
+            int nextPageIndex = page + 1;
+            while (scroller.hasPage(nextPageIndex)) {
+                Inventory nextInventory = scroller.pages.get(nextPageIndex);
+                for (int slot : slots) {
+                    if (slot >= 0 && slot < newInventoryItems.size()) {
+                        nextInventory.setItem(slot, newInventoryItems.get(slot));
+                    }
+                }
+                nextPageIndex++;
+            }
+        }*/
+
+        public void replaceInventoryItems(List<ItemStack> newInventoryItems) {
+            if (inventory == null || newInventoryItems == null) {
+                return; // Inventory or new items not set, nothing to replace
+            }
+            inventory.clear();
+            for (int slot = 0; slot < newInventoryItems.size() && slot < slots.size(); slot++) {
+                inventory.setItem(slots.get(slot), newInventoryItems.get(slot));
+            }
+
+            // Update arrow items for navigating between pages
+            if (previousPage >= 0 && scroller.hasPage(page - 1)) {
+                inventory.setItem(previousPage, getPageFlecha(page - 1));
+            }
+            if (nextPage >= 0 && scroller.hasPage(page + 1)) {
+                inventory.setItem(nextPage, getPageFlecha(page + 1));
+            }
+            // Update the inventory in the pages map
+            if (scroller != null && scroller.pages.containsKey(page)) {
+                scroller.pages.put(page, inventory);
+            }
+            // Update items in the next pages
+            int nextPageIndex = page + 1;
+            List<List<ItemStack>> pages = getPages(newInventoryItems, slots.size());
+            for (int i = nextPageIndex; i <= pages.size(); i++) {
+                if (scroller.hasPage(i)) {
+                    Inventory nextInventory = scroller.pages.get(i);
+                    List<ItemStack> nextPageItems = pages.get(i - 1);
+                    for (int slot : slots) {
+                        int slotIndex = slot - slots.get(0); // Calculate the index within the slot list
+                        if (slotIndex >= 0 && slotIndex < nextPageItems.size()) {
+                            nextInventory.setItem(slot, nextPageItems.get(slotIndex));
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -196,6 +293,9 @@ public class InvAPI {
         private PlayerRunnable backRunnable;
         private ChooseItemRunnable clickRunnable;
 
+        private UUID owner;
+        private Sort sortMethod;
+
         private final static List<Integer> ALLOWED_SLOTS = Arrays.asList(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23,
                 24, 25, 28, 29, 30, 31, 32, 33, 34
                 /* ,37,38,39,40,41,42,43 */); // slots para caso o inventário tiver 6 linhas
@@ -209,10 +309,22 @@ public class InvAPI {
             this.backSlot = -1;
             this.previousPage = 18;
             this.nextPage = 26;
+            this.owner = null;
+            this.sortMethod = Sort.AMOUNT_REVERSED;
         }
 
         public ScrollerBuilder withItems(ArrayList<ItemStack> items) {
             this.items = items;
+            return this;
+        }
+
+        public ScrollerBuilder withOwnerUUID(UUID ownerUUID) {
+            this.owner = ownerUUID;
+            return this;
+        }
+
+        public ScrollerBuilder withSortMethod(Sort sortMethod) {
+            this.sortMethod = sortMethod;
             return this;
         }
 

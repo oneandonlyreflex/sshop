@@ -3,6 +3,7 @@ package io.github.reflex.sshop.models;
 import io.github.reflex.sshop.Main;
 import io.github.reflex.sshop.util.ItemBuilder;
 import io.github.reflex.sshop.util.MobType;
+import io.github.reflex.sshop.util.Sort;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
