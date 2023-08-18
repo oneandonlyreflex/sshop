@@ -196,44 +196,7 @@ public class InvAPI {
             this.sortMethod = sortMethod;
         }
 
-        /*public void replaceInventoryItems(List<ItemStack> newInventoryItems) {
-            if (inventory == null || newInventoryItems == null) {
-                return; // Inventory or new items not set, nothing to replace
-            }
-
-            inventory.clear();
-
-            for (int slot = 0; slot < newInventoryItems.size() && slot < slots.size(); slot++) {
-                inventory.setItem(slots.get(slot), newInventoryItems.get(slot));
-            }
-
-            // Update arrow items for navigating between pages
-            if (previousPage >= 0 && scroller.hasPage(page - 1)) {
-                inventory.setItem(previousPage, getPageFlecha(page - 1));
-            }
-
-            if (nextPage >= 0 && scroller.hasPage(page + 1)) {
-                inventory.setItem(nextPage, getPageFlecha(page + 1));
-            }
-
-            // Update the inventory in the pages map
-            if (scroller != null && scroller.pages.containsKey(page)) {
-                scroller.pages.put(page, inventory);
-            }
-
-            // Update items in the next pages
-            int nextPageIndex = page + 1;
-            while (scroller.hasPage(nextPageIndex)) {
-                Inventory nextInventory = scroller.pages.get(nextPageIndex);
-                for (int slot : slots) {
-                    if (slot >= 0 && slot < newInventoryItems.size()) {
-                        nextInventory.setItem(slot, newInventoryItems.get(slot));
-                    }
-                }
-                nextPageIndex++;
-            }
-        }*/
-
+        //NEW METHOD EXTRA API
         public void replaceInventoryItems(List<ItemStack> newInventoryItems) {
             if (inventory == null || newInventoryItems == null) {
                 return; // Inventory or new items not set, nothing to replace

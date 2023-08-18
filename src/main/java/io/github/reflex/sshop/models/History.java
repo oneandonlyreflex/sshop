@@ -33,7 +33,7 @@ public class History {
                         "",
                         "§7Amount spent: §c" + gatherAmountSpent(spawnerType),
                         "§7Bought at: §c" + getFormattedBoughtTime(),
-                        "") //fix method
+                        "")
 
                 .build();
     }

@@ -24,7 +24,7 @@ public class UserManager {
         return users.get(Players.fetchPlayerUniqueId(playerName));
     }
 
-    public void createUser(UUID playerId) { //Method creates a Non-existing user
+    public void createUser(UUID playerId) { // Method creates a Non-existing user
         users.putIfAbsent(playerId, new User(playerId, new ArrayList<>()));
     }
 

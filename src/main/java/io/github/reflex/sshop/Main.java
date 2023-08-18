@@ -59,7 +59,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         if (mongoDB.pushMultipleUsersToDatabaseSync(userManager.getUsers())) {
-            Bukkit.getConsoleSender().sendMessage("§a[SSHOP] users saved, shutting down");
+            Bukkit.getConsoleSender().sendMessage("§a[SSHOP] Users saved, shutting down");
             spawnerManager = null;
             userManager = null;
             mongoDB.close();

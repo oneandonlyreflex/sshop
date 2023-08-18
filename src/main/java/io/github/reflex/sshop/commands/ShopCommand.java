@@ -50,13 +50,13 @@ public class ShopCommand extends Command {
                     return false;
                 }
                 if (Main.getInstance().userManager.fetchUserWithId(Players.fetchPlayerUniqueId(args[1])) == null) {
-                    //Player is not in the cache lets search for him in the database
+                    //Player is not in the cache lets search for him in the database , Null verificator is done, toString() will never be null
                     Main.getInstance().mongoDB.fetchUser(Players.fetchPlayerUniqueId(args[1]).toString()).thenAccept(user -> {
                         if (user == null) {
                             //User is not in database
                             s.sendMessage("§cThere are no avaliable data for that user's history");
                         } else {
-                            //loading user to cache
+                            //loading user to cache and opening the menu
                             s.sendMessage("§aOpening " + Players.getOfflinePlayer(user.getPlayerId()).getName() + "'s history");
                             Main.getInstance().userManager.register(user);
                             new HistoryInventory(Main.getInstance().userManager.getSortedList(user.getPlayerHistory(), Sort.AMOUNT_REVERSED), player, user.getPlayerId());

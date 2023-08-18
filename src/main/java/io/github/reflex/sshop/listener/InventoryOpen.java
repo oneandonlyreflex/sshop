@@ -60,7 +60,6 @@ public class InventoryOpen implements Listener {
     public void onHistoryInventoryOpen(InventoryOpenEvent inventoryOpenEvent) {
         if (inventoryOpenEvent.getInventory().getName().equalsIgnoreCase("§8Spawner History")) {
             ScrollerHolder scrollerHolder = (ScrollerHolder) inventoryOpenEvent.getInventory().getHolder();
-            System.out.println(scrollerHolder.getSortMethod());
             inventoryOpenEvent.getInventory().setItem(40, sortItem(scrollerHolder.getSortMethod()));
         }
     }
