@@ -24,10 +24,17 @@ public class Main extends JavaPlugin {
 
     public Configs config;
 
-    public SpawnerManager spawnerManager;
-    public UserManager userManager;
+    public final SpawnerManager spawnerManager;
+    public final UserManager userManager;
     public MongoDB mongoDB;
     public Economy economy;
+
+
+    public Main() {
+        this.spawnerManager = new SpawnerManager();
+        this.userManager = new UserManager();
+    }
+
 
     @Override
     public void onEnable() {
@@ -36,32 +43,28 @@ public class Main extends JavaPlugin {
         config = new Configs("config.yml");
         config.saveDefaultConfig();
 
-        spawnerManager = new SpawnerManager();
-        userManager = new UserManager();
-
-        Bukkit.getServer().getPluginManager().registerEvents(new InventoryClick(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new InventoryOpen(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
-
         try {
             mongoDB = MongoDB.mongoRepository(this, config.getString("MongoDB.connection_String"), config.getString("MongoDB.db_name"));
             SkullAPI.load();
             hookEconomy();
             CommandMapProvider.getCommandMap().registerAll("sshop", Arrays.asList(
-                    new ShopCommand()
+                    new ShopCommand(userManager, spawnerManager)
             ));
         } catch (Exception e) {
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
         }
+
+        Bukkit.getServer().getPluginManager().registerEvents(new InventoryClick(economy, userManager, spawnerManager), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new InventoryOpen(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
     }
 
     @Override
     public void onDisable() {
         if (mongoDB.pushMultipleUsersToDatabaseSync(userManager.getUsers())) {
             Bukkit.getConsoleSender().sendMessage("§a[SSHOP] Users saved, shutting down");
-            spawnerManager = null;
-            userManager = null;
+            //CLEAR MANAGERS.
             mongoDB.close();
         } else {
             Bukkit.getConsoleSender().sendMessage("§c[SSHOP] There was an error saving the users.");

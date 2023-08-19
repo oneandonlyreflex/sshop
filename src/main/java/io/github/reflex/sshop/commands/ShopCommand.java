@@ -3,17 +3,25 @@ package io.github.reflex.sshop.commands;
 import io.github.reflex.sshop.Main;
 import io.github.reflex.sshop.gui.HistoryInventory;
 import io.github.reflex.sshop.gui.SpawnerInventory;
+import io.github.reflex.sshop.manager.SpawnerManager;
+import io.github.reflex.sshop.manager.UserManager;
 import io.github.reflex.sshop.util.Players;
 import io.github.reflex.sshop.util.Sort;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ShopCommand extends Command {
+    
 
-
-    public ShopCommand() {
+    private final UserManager userManager;
+    private final SpawnerManager spawnerManager;
+    
+    public ShopCommand(UserManager userManager, SpawnerManager spawnerManager) {
         super("sshop");
+        this.userManager = userManager;
+        this.spawnerManager = spawnerManager;
     }
 
     @Override
@@ -30,11 +38,11 @@ public class ShopCommand extends Command {
         if (args.length == 1) {
             switch (args[0]) {
                 case "buy":
-                    new SpawnerInventory(Main.getInstance().spawnerManager.getSpawnerList(), player);
+                    new SpawnerInventory(spawnerManager.getSpawnerList(), player); //fix new and instance methods
                     break;
                 case "history":
-                    new HistoryInventory(Main.getInstance().userManager
-                            .getSortedList(Main.getInstance().userManager.fetchUserWithId(player.getUniqueId()).getPlayerHistory(), Sort.AMOUNT_REVERSED) , player, player.getUniqueId());
+                    new HistoryInventory(userManager
+                            .getSortedList(userManager.fetchUserWithId(player.getUniqueId()).getPlayerHistory(), Sort.AMOUNT_REVERSED) , player, player.getUniqueId());
                     break;
                 default:
                     s.sendMessage("§cUsage: /sshop (buy/history)");
@@ -45,11 +53,14 @@ public class ShopCommand extends Command {
         }
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("history")) {
+                if (Bukkit.getPlayer(args[1]) != null) {
+                    new HistoryInventory(userManager.getSortedList(userManager.fetchUserWithId(Bukkit.getPlayer(args[1]).getUniqueId()).getPlayerHistory(), Sort.AMOUNT_REVERSED), player, Bukkit.getPlayer(args[1]).getUniqueId());
+                }
                 if (Players.fetchPlayerUniqueId(args[1]) == null) {
                     s.sendMessage("§cThat player does not exist.");
                     return false;
                 }
-                if (Main.getInstance().userManager.fetchUserWithId(Players.fetchPlayerUniqueId(args[1])) == null) {
+                if (userManager.fetchUserWithId(Players.fetchPlayerUniqueId(args[1])) == null) {
                     //Player is not in the cache lets search for him in the database , Null verificator is done, toString() will never be null
                     Main.getInstance().mongoDB.fetchUser(Players.fetchPlayerUniqueId(args[1]).toString()).thenAccept(user -> {
                         if (user == null) {
@@ -58,11 +69,14 @@ public class ShopCommand extends Command {
                         } else {
                             //loading user to cache and opening the menu
                             s.sendMessage("§aOpening " + Players.getOfflinePlayer(user.getPlayerId()).getName() + "'s history");
-                            Main.getInstance().userManager.register(user);
-                            new HistoryInventory(Main.getInstance().userManager.getSortedList(user.getPlayerHistory(), Sort.AMOUNT_REVERSED), player, user.getPlayerId());
+                            userManager.register(user);
+                            new HistoryInventory(userManager.getSortedList(user.getPlayerHistory(), Sort.AMOUNT_REVERSED), player, user.getPlayerId());
                         }
                     });
                     return false;
+                } else  {
+                    //is in database
+                    new HistoryInventory(userManager.getSortedList(userManager.fetchUserWithId(Players.fetchPlayerUniqueId(args[1])).getPlayerHistory(), Sort.AMOUNT_REVERSED), player, Players.fetchPlayerUniqueId(args[1]));
                 }
             } else {
                 s.sendMessage("§cUsage: /sshop history (player)");

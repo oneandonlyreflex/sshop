@@ -20,7 +20,7 @@ public class SpawnerManager {
         loadSpawners();
     }
 
-    public void loadSpawners() {
+    private void loadSpawners() {
         for (String key : Main.getInstance().config.getConfig().getConfigurationSection("Spawners").getKeys(false)) {
             try {
                 Spawner spawner = new Spawner(EntityType.valueOf(key), Main.getInstance().config.getConfig().getInt("Spawners." + key));
